@@ -1,35 +1,45 @@
-import Versions from './components/Versions'
-import electronLogo from './assets/electron.svg'
+import React from "react";
+import '../style.css' // importe les styles globaux du dossier renderer
 
-function App(): React.JSX.Element {
-  const ipcHandle = (): void => window.electron.ipcRenderer.send('ping')
-
+const App: React.FC = () => {
   return (
-    <>
-      <img alt="logo" className="logo" src={electronLogo} />
-      <div className="creator">Powered by electron-vite</div>
-      <div className="text">
-        Build an Electron app with <span className="react">React</span>
-        &nbsp;and <span className="ts">TypeScript</span>
-      </div>
-      <p className="tip">
-        Please try pressing <code>F12</code> to open the devTool
-      </p>
-      <div className="actions">
-        <div className="action">
-          <a href="https://electron-vite.org/" target="_blank" rel="noreferrer">
-            Documentation
-          </a>
-        </div>
-        <div className="action">
-          <a target="_blank" rel="noreferrer" onClick={ipcHandle}>
-            Send IPC
-          </a>
-        </div>
-      </div>
-      <Versions></Versions>
-    </>
-  )
-}
+    <div className="app">
+      <header className="app-header">
+        <h1 className="app-title">Pomodoro</h1>
+        <p className="app-subtitle">Concentre-toi sur une tâche à la fois.</p>
+      </header>
 
-export default App
+      <main className="app-main">
+        <section className="mode-switch">
+          <button className="mode-btn mode-btn--active">Travail</button>
+          <button className="mode-btn">Pause</button>
+        </section>
+
+        <section className="timer-wrapper">
+          <div className="timer-circle">
+            {/* Valeurs statiques pour l'instant, on branchera la logique après */}
+            <span className="timer-time">25:00</span>
+            <span className="timer-label">Session de travail</span>
+          </div>
+        </section>
+
+        <section className="controls">
+          <button className="control-btn control-btn--primary">Start</button>
+          <button className="control-btn">Pause</button>
+          <button className="control-btn control-btn--danger">Reset</button>
+        </section>
+
+        <section className="bottom-info">
+          <p className="bottom-text">
+            Cycle actuel : <strong>1 / 4</strong>
+          </p>
+          <p className="bottom-text bottom-text--muted">
+            Les stats et la logique arrivent juste après. 👀
+          </p>
+        </section>
+      </main>
+    </div>
+  );
+};
+
+export default App;
