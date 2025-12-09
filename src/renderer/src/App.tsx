@@ -1,5 +1,6 @@
-import React from "react";
+import React from 'react'
 import '../style.css' // importe les styles globaux du dossier renderer
+import Timer from './Timer'
 
 const App: React.FC = () => {
   return (
@@ -15,19 +16,7 @@ const App: React.FC = () => {
           <button className="mode-btn">Pause</button>
         </section>
 
-        <section className="timer-wrapper">
-          <div className="timer-circle">
-            {/* Valeurs statiques pour l'instant, on branchera la logique après */}
-            <span className="timer-time">25:00</span>
-            <span className="timer-label">Session de travail</span>
-          </div>
-        </section>
-
-        <section className="controls">
-          <button className="control-btn control-btn--primary">Start</button>
-          <button className="control-btn">Pause</button>
-          <button className="control-btn control-btn--danger">Reset</button>
-        </section>
+        <Timer workDuration={25} />
 
         <section className="bottom-info">
           <p className="bottom-text">
@@ -39,7 +28,7 @@ const App: React.FC = () => {
         </section>
       </main>
     </div>
-  );
-};
+  )
+}
 
-export default App;
+export default App
