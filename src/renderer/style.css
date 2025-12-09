@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap");
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
 
 :root {
   --bg: #1f1f2e;
@@ -26,8 +26,13 @@ body {
 
 body {
   margin: 0;
-  font-family: "Poppins", system-ui, -apple-system, BlinkMacSystemFont,
-    "Segoe UI", sans-serif;
+  font-family:
+    'Poppins',
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    sans-serif;
   background: radial-gradient(circle at top, #25253a 0, #1f1f2e 40%, #151520);
   color: var(--text-main);
 }
@@ -108,18 +113,40 @@ body {
   justify-content: center;
 }
 
+/* Anneau externe qui se vide */
 .timer-circle {
   width: 220px;
   height: 220px;
   border-radius: 50%;
-  border: 8px solid var(--accent);
+  padding: 10px; /* pour faire de la place à l'inner */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.65);
+  transition: background 0.2s linear;
+}
+
+/* Cercle intérieur (fond fixe) */
+.timer-inner {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
   background: radial-gradient(circle at top, #32324a 0, #262637 60%, #1b1b29);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.65), 0 0 25px var(--accent-soft);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  position: relative;
+}
+
+.timer-time {
+  font-size: 46px;
+  font-weight: 600;
+}
+
+.timer-label {
+  font-size: 12px;
+  margin-top: 6px;
+  color: var(--text-muted);
 }
 
 .timer-time {
