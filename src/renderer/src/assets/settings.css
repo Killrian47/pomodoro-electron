@@ -14,6 +14,7 @@
   background: rgba(0, 0, 0, 0.25);
   color: var(--text-muted);
   transition: 0.15s;
+  text-decoration: none;
 }
 
 .nav-btn--active {
