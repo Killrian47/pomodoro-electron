@@ -64,9 +64,7 @@ const Timer: React.FC = () => {
     })
 
     setData((prev) =>
-      prev
-        ? { ...prev, stats: result.stats, history: [result.entry, ...prev.history] }
-        : prev
+      prev ? { ...prev, stats: result.stats, history: [result.entry, ...prev.history] } : prev
     )
     // Tu pourras mettre une notif ici
   }

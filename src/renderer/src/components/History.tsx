@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react'
+import '../assets/history.css'
 import type { HistoryEntry } from '../types/storage'
 
 const formatDate = (value: string): string => {
