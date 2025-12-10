@@ -36,11 +36,12 @@ body {
     sans-serif;
   background: radial-gradient(circle at top, #25253a 0, #1f1f2e 40%, #151520);
   color: var(--text-main);
+  overflow: hidden; /* bloque le scroll et garde la même hauteur que la fenêtre */
 }
 
 /* Racine React */
 #root {
-  min-height: 100vh;
+  height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -49,6 +50,11 @@ body {
 /* Carte principale */
 .app {
   width: 380px;
+  min-height: 640px;
+  max-height: 840px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden; /* le contenu scrolle en interne si nécessaire */
   padding: 24px 22px 20px;
   border-radius: 20px;
   background: linear-gradient(145deg, #2a2a3a, #212131);
@@ -76,6 +82,8 @@ body {
 
 /* Contenu principal */
 .app-main {
+  flex: 1;
+  overflow-y: auto;
   display: flex;
   flex-direction: column;
   gap: 18px;
