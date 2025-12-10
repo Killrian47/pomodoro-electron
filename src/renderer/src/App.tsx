@@ -6,6 +6,7 @@ const App: React.FC = () => {
   const { pathname } = useLocation()
   const isTimer = pathname === '/' || pathname === '/timer'
   const isSettings = pathname === '/settings'
+  const isHistory = pathname === '/history'
 
   return (
     <div className="app">
@@ -27,6 +28,14 @@ const App: React.FC = () => {
             }
           >
             Réglages
+          </NavLink>
+          <NavLink
+            to="/history"
+            className={({ isActive }) =>
+              `nav-btn ${isActive || isHistory ? 'nav-btn--active' : ''}`
+            }
+          >
+            Historique
           </NavLink>
         </nav>
       </header>

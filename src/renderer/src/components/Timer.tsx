@@ -6,6 +6,7 @@ const Timer: React.FC = () => {
   const [secondsRemaining, setSecondsRemaining] = useState(0)
   const [isRunning, setIsRunning] = useState(false)
   const intervalRef = useRef<number | null>(null)
+  const finishingRef = useRef(false)
 
   // Charger les settings au démarrage
   useEffect(() => {
@@ -19,6 +20,7 @@ const Timer: React.FC = () => {
 
   const start = (): void => {
     if (!data || intervalRef.current !== null) return
+    finishingRef.current = false
     setIsRunning(true)
     intervalRef.current = window.setInterval(() => {
       setSecondsRemaining((prev) => {
@@ -46,19 +48,26 @@ const Timer: React.FC = () => {
   const reset = (): void => {
     if (!data) return
     pause()
+    finishingRef.current = false
     setSecondsRemaining(data.settings.workDuration * 60)
   }
 
   const onFinish = async (): Promise<void> => {
+    if (finishingRef.current) return
+    finishingRef.current = true
     pause()
     if (!data) return
 
-    const newStats = await window.api.updateStats({
-      totalSessions: data.stats.totalSessions + 1,
-      totalMinutes: data.stats.totalMinutes + data.settings.workDuration
+    const result = await window.api.recordSession({
+      type: 'work',
+      durationMinutes: data.settings.workDuration
     })
 
-    setData({ ...data, stats: newStats })
+    setData((prev) =>
+      prev
+        ? { ...prev, stats: result.stats, history: [result.entry, ...prev.history] }
+        : prev
+    )
     // Tu pourras mettre une notif ici
   }
 

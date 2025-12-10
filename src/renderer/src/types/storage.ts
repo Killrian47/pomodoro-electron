@@ -10,9 +10,21 @@ export interface Settings {
 export interface Stats {
   totalSessions: number
   totalMinutes: number
+  bestStreak: number
+  currentStreak: number
+}
+
+export type SessionType = 'work' | 'break'
+
+export interface HistoryEntry {
+  id: string
+  type: SessionType
+  durationMinutes: number
+  completedAt: string
 }
 
 export interface AppData {
   settings: Settings
   stats: Stats
+  history: HistoryEntry[]
 }

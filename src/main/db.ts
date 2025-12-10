@@ -1,3 +1,4 @@
+import { randomUUID } from 'crypto'
 import { app } from 'electron'
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs'
 import { join } from 'path'
@@ -16,9 +17,19 @@ export interface UserStats {
   currentStreak: number
 }
 
+export type SessionType = 'work' | 'break'
+
+export interface HistoryEntry {
+  id: string
+  type: SessionType
+  durationMinutes: number
+  completedAt: string
+}
+
 export interface AppData {
   settings: TimerSettings
   stats: UserStats
+  history: HistoryEntry[]
 }
 
 const DEFAULT_DATA: AppData = {
@@ -33,11 +44,20 @@ const DEFAULT_DATA: AppData = {
     totalMinutes: 0,
     bestStreak: 0,
     currentStreak: 0
-  }
+  },
+  history: []
 }
 
 const dir = join(app.getPath('userData'), 'pomodoro')
 const file = join(dir, 'data.json')
+
+function normalizeData(raw: Partial<AppData> | null): AppData {
+  return {
+    settings: { ...DEFAULT_DATA.settings, ...(raw?.settings ?? {}) },
+    stats: { ...DEFAULT_DATA.stats, ...(raw?.stats ?? {}) },
+    history: raw?.history ?? []
+  }
+}
 
 // --- Fonctions de base ---
 
@@ -53,9 +73,23 @@ export function loadData(): AppData {
 
   const raw = readFileSync(file, 'utf-8')
   try {
-    return JSON.parse(raw) as AppData
+    const parsed = JSON.parse(raw) as Partial<AppData> | null
+    const normalized = normalizeData(parsed)
+    const needsSave =
+      !parsed ||
+      parsed.history === undefined ||
+      parsed.settings?.autoStart === undefined ||
+      parsed.settings?.soundEnabled === undefined ||
+      parsed.stats?.bestStreak === undefined ||
+      parsed.stats?.currentStreak === undefined
+
+    if (needsSave) {
+      saveData(normalized)
+    }
+
+    return normalized
   } catch {
-    // En cas de fichier corrompu → reset
+    // En cas de fichier corrompu -> reset
     writeFileSync(file, JSON.stringify(DEFAULT_DATA, null, 2), 'utf-8')
     return DEFAULT_DATA
   }
@@ -79,4 +113,28 @@ export function updateStats(partial: Partial<UserStats>): UserStats {
   const newData: AppData = { ...data, stats: newStats }
   saveData(newData)
   return newStats
+}
+
+export function recordSession(params: { type: SessionType; durationMinutes: number }): {
+  stats: UserStats
+  entry: HistoryEntry
+} {
+  const data = loadData()
+  const entry: HistoryEntry = {
+    id: randomUUID(),
+    type: params.type,
+    durationMinutes: params.durationMinutes,
+    completedAt: new Date().toISOString()
+  }
+
+  const updatedStats: UserStats = {
+    ...data.stats,
+    totalSessions: data.stats.totalSessions + 1,
+    totalMinutes: data.stats.totalMinutes + params.durationMinutes
+  }
+
+  const newData: AppData = { ...data, stats: updatedStats, history: [entry, ...data.history] }
+  saveData(newData)
+
+  return { stats: updatedStats, entry }
 }
