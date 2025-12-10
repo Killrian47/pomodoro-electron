@@ -1,6 +1,15 @@
 import { app, BrowserWindow, ipcMain } from 'electron'
 import path from 'path'
-import { loadData, updateSettings, updateStats, AppData, TimerSettings, UserStats } from './db'
+import {
+  loadData,
+  updateSettings,
+  updateStats,
+  recordSession,
+  AppData,
+  TimerSettings,
+  UserStats,
+  SessionType
+} from './db'
 
 let mainWindow: BrowserWindow | null = null
 
@@ -9,7 +18,7 @@ function createWindow(): void {
     width: 440, // adaptée à la largeur de la carte (380px) + marges
     height: 760, // valeur de départ, ajustée ensuite à la hauteur du HTML
     useContentSize: true,
-    resizable: false,
+    resizable: true,
     webPreferences: {
       preload: path.join(__dirname, '../preload/index.js')
     }
@@ -20,6 +29,8 @@ function createWindow(): void {
   } else {
     mainWindow.loadFile(path.join(__dirname, '../renderer/index.html'))
   }
+
+  mainWindow.webContents.openDevTools()
 
   // Ajuste la taille de la fenêtre à la hauteur réelle du contenu
   mainWindow.webContents.on('did-finish-load', async () => {
@@ -38,6 +49,7 @@ function createWindow(): void {
   })
 }
 
+
 // Ici on enregistre les routes "back"
 function registerIpcHandlers(): void {
   ipcMain.handle('db:get', (): AppData => {
@@ -51,6 +63,13 @@ function registerIpcHandlers(): void {
   ipcMain.handle('db:updateStats', (_event, partial: Partial<UserStats>): UserStats => {
     return updateStats(partial)
   })
+
+  ipcMain.handle(
+    'db:recordSession',
+    (_event, payload: { type: SessionType; durationMinutes: number }) => {
+      return recordSession(payload)
+    }
+  )
 }
 
 app.whenReady().then(() => {
