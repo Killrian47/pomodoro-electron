@@ -1,4 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+@import './src/assets/settings.css';
 
 :root {
   --bg: #1f1f2e;
@@ -203,6 +204,7 @@ body {
 }
 
 .bottom-text {
+  text-align: center;
   font-size: 12px;
 }
 
