@@ -6,5 +6,8 @@ contextBridge.exposeInMainWorld('api', {
   updateSettings: (partial: Partial<TimerSettings>): Promise<TimerSettings> =>
     ipcRenderer.invoke('db:updateSettings', partial),
   updateStats: (partial: Partial<UserStats>): Promise<UserStats> =>
-    ipcRenderer.invoke('db:updateStats', partial)
+    ipcRenderer.invoke('db:updateStats', partial),
+  openSettingsWindow: (): void => {
+    ipcRenderer.send('window:openSettings')
+  }
 })

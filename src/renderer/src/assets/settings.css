@@ -1,0 +1,70 @@
+.top-nav {
+  margin-top: 12px;
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+}
+
+.nav-btn {
+  padding: 4px 10px;
+  border-radius: 999px;
+  border: none;
+  cursor: pointer;
+  font-size: 12px;
+  background: rgba(0, 0, 0, 0.25);
+  color: var(--text-muted);
+  transition: 0.15s;
+}
+
+.nav-btn--active {
+  background: var(--accent);
+  color: #fff;
+}
+
+.nav-btn:hover {
+  filter: brightness(1.1);
+}
+
+/* Settings page */
+
+.settings {
+  width: 100%;
+}
+
+.settings-title {
+  font-size: 18px;
+  margin-bottom: 12px;
+  text-align: center;
+}
+
+.settings-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.settings-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 13px;
+}
+
+.settings-field input[type='number'] {
+  border-radius: 8px;
+  border: none;
+  padding: 6px 8px;
+  background: #2f2f43;
+  color: var(--text-main);
+}
+
+.settings-field--row {
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.settings-field input[type='checkbox'] {
+  transform: scale(1.1);
+}

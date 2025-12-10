@@ -2,8 +2,11 @@ import { app, BrowserWindow, ipcMain } from 'electron'
 import path from 'path'
 import { loadData, updateSettings, updateStats, AppData, TimerSettings, UserStats } from './db'
 
+let mainWindow: BrowserWindow | null = null
+let settingsWindow: BrowserWindow | null = null
+
 function createWindow(): void {
-  const mainWindow = new BrowserWindow({
+  mainWindow = new BrowserWindow({
     width: 900,
     height: 900,
     webPreferences: {
@@ -12,10 +15,33 @@ function createWindow(): void {
   })
 
   if (process.env.ELECTRON_RENDERER_URL) {
-    mainWindow.loadURL(process.env.ELECTRON_RENDERER_URL)
+    // Timer
+    mainWindow.loadURL(process.env.ELECTRON_RENDERER_URL + '#/timer')
   } else {
     mainWindow.loadFile(path.join(__dirname, '../renderer/index.html'))
   }
+}
+
+function createSettingsWindow(): void {
+  settingsWindow = new BrowserWindow({
+    width: 900,
+    height: 900,
+    title: 'Réglages timer',
+    webPreferences: {
+      preload: path.join(__dirname, '../preload/index.js')
+    }
+  })
+
+  if (process.env.ELECTRON_RENDERER_URL) {
+    // Settings
+    settingsWindow.loadURL(process.env.ELECTRON_RENDERER_URL + '#/settings')
+  } else {
+    settingsWindow.loadFile(path.join(__dirname, '../renderer/index.html'))
+  }
+
+  settingsWindow.on('closed', () => {
+    settingsWindow = null
+  })
 }
 
 // 🔌 Ici on enregistre les routes "back"
@@ -33,8 +59,12 @@ function registerIpcHandlers(): void {
   })
 }
 
+ipcMain.on('window:openSettings', () => {
+  createSettingsWindow()
+})
+
 app.whenReady().then(() => {
-  console.log('userData path:', app.getPath('userData'))
+  //console.log('userData path:', app.getPath('userData'))
   registerIpcHandlers() // 👈 important
   createWindow()
 

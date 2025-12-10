@@ -75,6 +75,11 @@ const Timer: React.FC = () => {
 
   return (
     <>
+      <section className="mode-switch">
+        <button className="mode-btn mode-btn--active">Travail</button>
+        <button className="mode-btn">Pause</button>
+      </section>
+
       <div className="timer-wrapper">
         <div
           className="timer-circle"
