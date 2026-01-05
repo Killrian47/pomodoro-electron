@@ -5,6 +5,9 @@ import {
   updateSettings,
   updateStats,
   recordSession,
+  getSettings,
+  getStats,
+  getHistory,
   AppData,
   TimerSettings,
   UserStats,
@@ -68,6 +71,18 @@ function registerIpcHandlers(): void {
       return recordSession(payload)
     }
   )
+
+  ipcMain.handle('db:getSettingsOnly', (): TimerSettings => {
+    return getSettings()
+  })
+
+  ipcMain.handle('db:getStatsOnly', (): UserStats => {
+    return getStats()
+  })
+
+  ipcMain.handle('db:getHistoryOnly', (): ReturnType<typeof getHistory> => {
+    return getHistory()
+  })
 }
 
 app.whenReady().then(() => {
@@ -80,7 +95,7 @@ app.whenReady().then(() => {
   })
 })
 
-Menu.setApplicationMenu(null);
+Menu.setApplicationMenu(null)
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') app.quit()

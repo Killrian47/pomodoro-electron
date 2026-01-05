@@ -99,6 +99,18 @@ export function saveData(data: AppData): void {
   writeFileSync(file, JSON.stringify(data, null, 2), 'utf-8')
 }
 
+export function getSettings(): TimerSettings {
+  return loadData().settings
+}
+
+export function getStats(): UserStats {
+  return loadData().stats
+}
+
+export function getHistory(): HistoryEntry[] {
+  return loadData().history
+}
+
 export function updateSettings(partial: Partial<TimerSettings>): TimerSettings {
   const data = loadData()
   const newSettings = { ...data.settings, ...partial }

@@ -8,11 +8,11 @@ const TimerSettings: React.FC = () => {
   const [message, setMessage] = useState<string | null>(null)
 
   useEffect(() => {
-    // On récupère les settings depuis le back (main)
+    // On récupère uniquement les settings depuis le back (main)
     window.api
-      .getData()
-      .then((data) => {
-        setSettings(data.settings)
+      .getSettings()
+      .then((s) => {
+        setSettings(s)
         setLoading(false)
       })
       .catch(() => {

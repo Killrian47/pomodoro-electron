@@ -1,26 +1,84 @@
 import React, { useEffect, useRef, useState } from 'react'
-import type { AppData } from '../types/storage'
+import BreakTimer from './break/BreakTimer'
+import WorkTimer from './work/WorkTimer'
+import type { Settings, Stats } from '../types/storage'
+
+type Mode = 'work' | 'break'
+const PRE_BREAK_DURATION = 5
 
 const Timer: React.FC = () => {
-  const [data, setData] = useState<AppData | null>(null)
+  const [settings, setSettings] = useState<Settings | null>(null)
+  const [stats, setStats] = useState<Stats | null>(null)
+  const [mode, setMode] = useState<Mode>('work')
   const [secondsRemaining, setSecondsRemaining] = useState(0)
+  const [preBreakSeconds, setPreBreakSeconds] = useState<number | null>(null)
   const [isRunning, setIsRunning] = useState(false)
   const intervalRef = useRef<number | null>(null)
+  const preBreakRef = useRef<number | null>(null)
   const finishingRef = useRef(false)
+  const modeRef = useRef<Mode>(mode)
+
+  useEffect(() => {
+    modeRef.current = mode
+  }, [mode])
 
   // Charger les settings au démarrage
   useEffect(() => {
-    window.api.getData().then((d) => {
-      setData(d)
-      setSecondsRemaining(d.settings.workDuration * 60)
-    })
+    const load = async (): Promise<void> => {
+      const [s, st] = await Promise.all([window.api.getSettings(), window.api.getStats()])
+      setSettings(s)
+      setStats(st)
+      setSecondsRemaining(s.workDuration * 60)
+    }
+    load()
   }, [])
 
-  const totalSeconds = data ? data.settings.workDuration * 60 : 1
+  const playBeep = (): void => {
+    if (!settings?.soundEnabled) return
+    const ctx = new AudioContext()
+    const osc = ctx.createOscillator()
+    const gain = ctx.createGain()
+    osc.type = 'sine'
+    osc.frequency.value = 880
+    gain.gain.value = 0.1
+    osc.connect(gain)
+    gain.connect(ctx.destination)
+    osc.start()
+    osc.stop(ctx.currentTime + 0.2)
+    osc.onended = () => ctx.close()
+  }
 
-  const start = (): void => {
-    if (!data || intervalRef.current !== null) return
-    finishingRef.current = false
+  const clearMainInterval = (): void => {
+    if (intervalRef.current !== null) {
+      clearInterval(intervalRef.current)
+      intervalRef.current = null
+    }
+  }
+
+  const clearPreBreak = (): void => {
+    if (preBreakRef.current !== null) {
+      clearInterval(preBreakRef.current)
+      preBreakRef.current = null
+    }
+    setPreBreakSeconds(null)
+  }
+
+  const pause = (): void => {
+    setIsRunning(false)
+    clearMainInterval()
+  }
+
+  useEffect(
+    () => () => {
+      clearMainInterval()
+      clearPreBreak()
+    },
+    []
+  )
+
+  const startMainCountdown = (forceStart = false): void => {
+    if (!settings || intervalRef.current !== null || (!forceStart && preBreakSeconds !== null))
+      return
     setIsRunning(true)
     intervalRef.current = window.setInterval(() => {
       setSecondsRemaining((prev) => {
@@ -33,92 +91,148 @@ const Timer: React.FC = () => {
     }, 1000)
   }
 
-  const stop = (): void => {
-    if (intervalRef.current !== null) {
-      clearInterval(intervalRef.current)
-      intervalRef.current = null
-    }
-  }
+  const start = (): void => {
+    if (!settings) return
+    finishingRef.current = false
 
-  const pause = (): void => {
-    setIsRunning(false)
-    stop()
+    if (secondsRemaining <= 0) {
+      const nextSeconds = mode === 'work' ? settings.workDuration * 60 : settings.breakDuration * 60
+      setSecondsRemaining(nextSeconds)
+    }
+
+    startMainCountdown()
   }
 
   const reset = (): void => {
-    if (!data) return
+    if (!settings) return
     pause()
+    clearPreBreak()
     finishingRef.current = false
-    setSecondsRemaining(data.settings.workDuration * 60)
+    const nextSeconds = mode === 'work' ? settings.workDuration * 60 : settings.breakDuration * 60
+    setSecondsRemaining(nextSeconds)
+  }
+
+  const switchMode = (next: Mode): void => {
+    if (!settings || isRunning || intervalRef.current !== null || preBreakSeconds !== null) return
+    pause()
+    clearPreBreak()
+    finishingRef.current = false
+    setMode(next)
+    const nextSeconds = next === 'work' ? settings.workDuration * 60 : settings.breakDuration * 60
+    setSecondsRemaining(nextSeconds)
+  }
+
+  const startPreBreak = (): void => {
+    clearPreBreak()
+    setPreBreakSeconds(PRE_BREAK_DURATION)
+    playBeep()
+    preBreakRef.current = window.setInterval(() => {
+      setPreBreakSeconds((prev) => {
+        if (prev === null) return prev
+        if (prev <= 1) {
+          clearPreBreak()
+          if (settings) {
+            console.log(mode)
+            setMode('break')
+            console.log(mode)
+            const breakSeconds = settings.breakDuration * 60
+            setSecondsRemaining(breakSeconds)
+            setIsRunning(false)
+            startMainCountdown(true)
+          }
+          return null
+        }
+        playBeep()
+        return prev - 1
+      })
+    }, 1000)
   }
 
   const onFinish = async (): Promise<void> => {
     if (finishingRef.current) return
     finishingRef.current = true
     pause()
-    if (!data) return
+    if (!settings) {
+      finishingRef.current = false
+      return
+    }
 
-    const result = await window.api.recordSession({
-      type: 'work',
-      durationMinutes: data.settings.workDuration
-    })
+    if (modeRef.current === 'work') {
+      const result = await window.api.recordSession({
+        type: 'work',
+        durationMinutes: settings.workDuration
+      })
 
-    setData((prev) =>
-      prev ? { ...prev, stats: result.stats, history: [result.entry, ...prev.history] } : prev
-    )
-    // Tu pourras mettre une notif ici
+      setStats(result.stats)
+
+      startPreBreak()
+    } else {
+      clearMainInterval()
+      clearPreBreak()
+      setMode('work')
+      setIsRunning(false)
+      setSecondsRemaining(0)
+    }
+
+    finishingRef.current = false
   }
-
-  useEffect(() => () => stop(), [])
 
   const format = (s: number): string =>
     `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`
 
-  if (!data) {
+  if (!settings || !stats) {
     return <p>Chargement...</p>
   }
 
-  const progress = secondsRemaining / totalSeconds
+  const totalSeconds =
+    preBreakSeconds !== null
+      ? PRE_BREAK_DURATION
+      : mode === 'work'
+        ? settings.workDuration * 60
+        : settings.breakDuration * 60
+
+  const progress = (preBreakSeconds ?? secondsRemaining) / totalSeconds
+  const displaySeconds = preBreakSeconds ?? secondsRemaining
+  const label =
+    preBreakSeconds !== null
+      ? `Pause dans ${preBreakSeconds}s`
+      : isRunning
+        ? mode === 'work'
+          ? 'Session en cours...'
+          : 'Pause en cours...'
+        : 'En pause'
+
+  const viewProps = {
+    formattedTime: format(displaySeconds),
+    label,
+    progress,
+    onStart: start,
+    onPause: pause,
+    onReset: reset
+  }
 
   return (
     <>
       <section className="mode-switch">
-        <button className="mode-btn mode-btn--active">Travail</button>
-        <button className="mode-btn">Pause</button>
-      </section>
-
-      <div className="timer-wrapper">
-        <div
-          className="timer-circle"
-          style={{
-            background: `conic-gradient(
-              var(--accent) ${progress * 360}deg,
-              rgba(0,0,0,0.35) 0deg
-            )`
-          }}
+        <button
+          className={`mode-btn ${mode === 'work' ? 'mode-btn--active' : ''}`}
+          onClick={() => switchMode('work')}
         >
-          <div className="timer-inner">
-            <span className="timer-time">{format(secondsRemaining)}</span>
-            <span className="timer-label">{isRunning ? 'En cours...' : 'En pause'}</span>
-          </div>
-        </div>
-      </div>
-
-      <div className="controls">
-        <button className="control-btn control-btn--primary" onClick={start}>
-          Start
+          Travail
         </button>
-        <button className="control-btn" onClick={pause}>
+        <button
+          className={`mode-btn ${mode === 'break' ? 'mode-btn--active' : ''}`}
+          onClick={() => switchMode('break')}
+        >
           Pause
         </button>
-        <button className="control-btn control-btn--danger" onClick={reset}>
-          Reset
-        </button>
-      </div>
+      </section>
+
+      {mode === 'work' ? <WorkTimer {...viewProps} /> : <BreakTimer {...viewProps} />}
 
       <p className="bottom-text">
-        Sessions terminées : <strong>{data.stats.totalSessions}</strong> | Minutes :{' '}
-        <strong>{data.stats.totalMinutes}</strong>
+        Sessions terminées : <strong>{stats.totalSessions}</strong> | Minutes :{' '}
+        <strong>{stats.totalMinutes}</strong>
       </p>
     </>
   )

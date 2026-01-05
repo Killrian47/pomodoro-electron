@@ -12,6 +12,9 @@ declare global {
         type: SessionType
         durationMinutes: number
       }) => Promise<{ stats: Stats; entry: HistoryEntry }>
+      getSettings: () => Promise<Settings>
+      getStats: () => Promise<Stats>
+      getHistory: () => Promise<HistoryEntry[]>
     }
   }
 }
