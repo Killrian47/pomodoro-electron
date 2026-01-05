@@ -181,6 +181,14 @@ body {
 }
 
 /* Timer rond */
+.timer-shell {
+  --timer-accent: var(--accent);
+}
+
+.timer-shell--break {
+  --timer-accent: var(--success);
+}
+
 .timer-wrapper {
   display: flex;
   justify-content: center;
