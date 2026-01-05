@@ -99,3 +99,24 @@
   color: #e5ffea;
   border: 1px solid var(--success);
 }
+
+@media (max-width: 420px) {
+  .history-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .history-title {
+    font-size: 16px;
+  }
+
+  .history-item {
+    padding: 10px;
+  }
+
+  .history-item__bottom {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+  }
+}

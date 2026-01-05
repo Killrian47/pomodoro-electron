@@ -15,6 +15,13 @@ declare global {
       getSettings: () => Promise<Settings>
       getStats: () => Promise<Stats>
       getHistory: () => Promise<HistoryEntry[]>
+      windowControls: {
+        minimize: () => Promise<void>
+        toggleMaximize: () => Promise<boolean>
+        isMaximized: () => Promise<boolean>
+        close: () => Promise<void>
+        onWindowState: (callback: (isMaximized: boolean) => void) => () => void
+      }
     }
   }
 }

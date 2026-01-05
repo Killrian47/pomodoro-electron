@@ -3,6 +3,8 @@
   display: flex;
   gap: 8px;
   justify-content: center;
+  flex-wrap: wrap;
+  row-gap: 6px;
 }
 
 .nav-btn {
@@ -10,7 +12,7 @@
   border-radius: 999px;
   border: none;
   cursor: pointer;
-  font-size: 12px;
+  font-size: clamp(11px, 3vw, 12px);
   background: rgba(0, 0, 0, 0.25);
   color: var(--text-muted);
   transition: 0.15s;
@@ -68,4 +70,22 @@
 
 .settings-field input[type='checkbox'] {
   transform: scale(1.1);
+}
+
+@media (max-width: 420px) {
+  .settings-title {
+    font-size: 16px;
+  }
+
+  .settings-field--row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+  }
+}
+
+@media (max-width: 360px) {
+  .nav-btn {
+    padding: 4px 8px;
+  }
 }

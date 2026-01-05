@@ -21,7 +21,10 @@ function createWindow(): void {
     width: 400, // adaptée à la largeur de la carte (380px) + marges
     height: 750, // valeur de départ, ajustée ensuite à la hauteur du HTML
     useContentSize: true,
-    resizable: false,
+    minWidth: 320,
+    minHeight: 520,
+    resizable: true,
+    frame: false,
     autoHideMenuBar: true,
     webPreferences: {
       preload: path.join(__dirname, '../preload/index.js')
@@ -48,6 +51,14 @@ function createWindow(): void {
     } catch (err) {
       console.error('Erreur lors du calcul de la hauteur de page:', err)
     }
+  })
+
+  mainWindow.on('maximize', () => {
+    mainWindow?.webContents.send('window:state', true)
+  })
+
+  mainWindow.on('unmaximize', () => {
+    mainWindow?.webContents.send('window:state', false)
   })
 }
 
@@ -82,6 +93,28 @@ function registerIpcHandlers(): void {
 
   ipcMain.handle('db:getHistoryOnly', (): ReturnType<typeof getHistory> => {
     return getHistory()
+  })
+
+  ipcMain.handle('window:minimize', () => {
+    mainWindow?.minimize()
+  })
+
+  ipcMain.handle('window:toggleMaximize', () => {
+    if (!mainWindow) return false
+    if (mainWindow.isMaximized()) {
+      mainWindow.unmaximize()
+    } else {
+      mainWindow.maximize()
+    }
+    return mainWindow.isMaximized()
+  })
+
+  ipcMain.handle('window:isMaximized', () => {
+    return mainWindow?.isMaximized() ?? false
+  })
+
+  ipcMain.handle('window:close', () => {
+    mainWindow?.close()
   })
 }
 
