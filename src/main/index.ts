@@ -1,10 +1,13 @@
-import { app, BrowserWindow, ipcMain } from 'electron'
+import { app, BrowserWindow, ipcMain, Menu } from 'electron'
 import path from 'path'
 import {
   loadData,
   updateSettings,
   updateStats,
   recordSession,
+  getSettings,
+  getStats,
+  getHistory,
   AppData,
   TimerSettings,
   UserStats,
@@ -15,10 +18,14 @@ let mainWindow: BrowserWindow | null = null
 
 function createWindow(): void {
   mainWindow = new BrowserWindow({
-    width: 440, // adaptée à la largeur de la carte (380px) + marges
-    height: 760, // valeur de départ, ajustée ensuite à la hauteur du HTML
+    width: 400, // adaptée à la largeur de la carte (380px) + marges
+    height: 750, // valeur de départ, ajustée ensuite à la hauteur du HTML
     useContentSize: true,
+    minWidth: 320,
+    minHeight: 520,
     resizable: true,
+    frame: false,
+    autoHideMenuBar: true,
     webPreferences: {
       preload: path.join(__dirname, '../preload/index.js')
     }
@@ -29,8 +36,6 @@ function createWindow(): void {
   } else {
     mainWindow.loadFile(path.join(__dirname, '../renderer/index.html'))
   }
-
-  mainWindow.webContents.openDevTools()
 
   // Ajuste la taille de la fenêtre à la hauteur réelle du contenu
   mainWindow.webContents.on('did-finish-load', async () => {
@@ -47,8 +52,15 @@ function createWindow(): void {
       console.error('Erreur lors du calcul de la hauteur de page:', err)
     }
   })
-}
 
+  mainWindow.on('maximize', () => {
+    mainWindow?.webContents.send('window:state', true)
+  })
+
+  mainWindow.on('unmaximize', () => {
+    mainWindow?.webContents.send('window:state', false)
+  })
+}
 
 // Ici on enregistre les routes "back"
 function registerIpcHandlers(): void {
@@ -70,6 +82,40 @@ function registerIpcHandlers(): void {
       return recordSession(payload)
     }
   )
+
+  ipcMain.handle('db:getSettingsOnly', (): TimerSettings => {
+    return getSettings()
+  })
+
+  ipcMain.handle('db:getStatsOnly', (): UserStats => {
+    return getStats()
+  })
+
+  ipcMain.handle('db:getHistoryOnly', (): ReturnType<typeof getHistory> => {
+    return getHistory()
+  })
+
+  ipcMain.handle('window:minimize', () => {
+    mainWindow?.minimize()
+  })
+
+  ipcMain.handle('window:toggleMaximize', () => {
+    if (!mainWindow) return false
+    if (mainWindow.isMaximized()) {
+      mainWindow.unmaximize()
+    } else {
+      mainWindow.maximize()
+    }
+    return mainWindow.isMaximized()
+  })
+
+  ipcMain.handle('window:isMaximized', () => {
+    return mainWindow?.isMaximized() ?? false
+  })
+
+  ipcMain.handle('window:close', () => {
+    mainWindow?.close()
+  })
 }
 
 app.whenReady().then(() => {
@@ -81,6 +127,8 @@ app.whenReady().then(() => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow()
   })
 })
+
+Menu.setApplicationMenu(null)
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') app.quit()

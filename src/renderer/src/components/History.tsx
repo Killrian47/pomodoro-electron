@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react'
+import '../assets/history.css'
 import type { HistoryEntry } from '../types/storage'
 
 const formatDate = (value: string): string => {
@@ -23,8 +24,8 @@ const History: React.FC = () => {
     setLoading(true)
     setError(null)
     try {
-      const data = await window.api.getData()
-      setEntries(data.history)
+      const history = await window.api.getHistory()
+      setEntries(history)
     } catch (err) {
       console.error(err)
       setError("Impossible de charger l'historique.")
