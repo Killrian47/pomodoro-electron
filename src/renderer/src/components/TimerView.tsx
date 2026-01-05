@@ -1,6 +1,6 @@
 import React from 'react'
 
-interface TimerViewProps {
+export interface TimerViewProps {
   formattedTime: string
   label: string
   progress: number
@@ -9,7 +9,7 @@ interface TimerViewProps {
   onReset: () => void
 }
 
-const WorkTimer: React.FC<TimerViewProps> = ({
+const TimerView: React.FC<TimerViewProps> = ({
   formattedTime,
   label,
   progress,
@@ -24,7 +24,7 @@ const WorkTimer: React.FC<TimerViewProps> = ({
           className="timer-circle"
           style={{
             background: `conic-gradient(
-              var(--accent) ${progress * 360}deg,
+              var(--timer-accent) ${progress * 360}deg,
               rgba(0,0,0,0.35) 0deg
             )`
           }}
@@ -51,4 +51,4 @@ const WorkTimer: React.FC<TimerViewProps> = ({
   )
 }
 
-export default WorkTimer
+export default TimerView

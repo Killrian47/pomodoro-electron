@@ -1,6 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react'
-import BreakTimer from './break/BreakTimer'
-import WorkTimer from './work/WorkTimer'
+import TimerView from './TimerView'
 import type { Settings, Stats } from '../types/storage'
 
 type Mode = 'work' | 'break'
@@ -228,11 +227,13 @@ const Timer: React.FC = () => {
         </button>
       </section>
 
-      {mode === 'work' ? <WorkTimer {...viewProps} /> : <BreakTimer {...viewProps} />}
+      <div className={`timer-shell timer-shell--${mode}`}>
+        <TimerView {...viewProps} />
+      </div>
 
       <p className="bottom-text">
-        Sessions terminées : <strong>{stats.totalSessions}</strong> | Minutes :{' '}
-        <strong>{stats.totalMinutes}</strong>
+        Sessions terminées : <strong>{stats.totalSessions}</strong> | Minutes travaillées :{' '}
+        <strong>{Math.round(stats.totalMinutes)}</strong>
       </p>
     </>
   )
