@@ -1,18 +1,7 @@
 import { app, BrowserWindow, ipcMain, Menu } from 'electron'
 import path from 'path'
-import {
-  loadData,
-  updateSettings,
-  updateStats,
-  recordSession,
-  getSettings,
-  getStats,
-  getHistory,
-  AppData,
-  TimerSettings,
-  UserStats,
-  SessionType
-} from './db'
+import { loadData, updateSettings, updateStats, recordSession, getSettings, getStats, getHistory } from './db'
+import type { AppData, TimerSettings, UserStats, SessionType } from '../shared/types'
 
 let mainWindow: BrowserWindow | null = null
 

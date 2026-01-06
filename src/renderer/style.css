@@ -234,6 +234,7 @@ body {
   justify-content: center;
   gap: clamp(8px, 2vw, 10px);
   flex-wrap: wrap;
+  margin-top: clamp(12px, 3vw, 18px);
 }
 
 .control-btn {

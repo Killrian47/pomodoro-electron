@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import type { Settings } from '../types/storage'
+import type { Settings } from '../../../shared/types'
 
 const TimerSettings: React.FC = () => {
   const [settings, setSettings] = useState<Settings | null>(null)

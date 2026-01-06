@@ -1,5 +1,5 @@
 import { contextBridge, ipcRenderer } from 'electron'
-import type { AppData, TimerSettings, UserStats, SessionType, HistoryEntry } from '../main/db'
+import type { AppData, TimerSettings, UserStats, SessionType, HistoryEntry } from '../shared/types'
 
 contextBridge.exposeInMainWorld('api', {
   getData: (): Promise<AppData> => ipcRenderer.invoke('db:get'),

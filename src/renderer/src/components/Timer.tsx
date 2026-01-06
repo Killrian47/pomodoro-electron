@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react'
 import TimerView from './TimerView'
-import type { Settings, Stats } from '../types/storage'
+import type { Settings, Stats } from '../../../shared/types'
 
 type Mode = 'work' | 'break'
 const PRE_BREAK_DURATION = 5
@@ -233,7 +233,7 @@ const Timer: React.FC = () => {
 
       <p className="bottom-text">
         Sessions terminées : <strong>{stats.totalSessions}</strong> | Minutes travaillées :{' '}
-        <strong>{Math.round(stats.totalMinutes)}</strong>
+        <strong>{Math.round(stats.totalMinutes)} mins</strong>
       </p>
     </>
   )

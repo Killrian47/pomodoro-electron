@@ -1,8 +1,6 @@
-// src/renderer/src/types/storage.ts
-
 export interface Settings {
-  workDuration: number // minutes
-  breakDuration: number // minutes
+  workDuration: number
+  breakDuration: number
   autoStart: boolean
   soundEnabled: boolean
 }
@@ -28,3 +26,6 @@ export interface AppData {
   stats: Stats
   history: HistoryEntry[]
 }
+
+export type TimerSettings = Settings
+export type UserStats = Stats
