@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import '../assets/history.css'
-import type { HistoryEntry } from '../types/storage'
+import type { HistoryEntry } from '../../../shared/types'
 
 const formatDate = (value: string): string => {
   const date = new Date(value)

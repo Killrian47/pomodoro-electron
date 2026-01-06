@@ -1,6 +1,6 @@
 /// <reference types="vite/client" />
 
-import type { AppData, Settings, Stats, HistoryEntry, SessionType } from './types/storage'
+import type { AppData, Settings, Stats, HistoryEntry, SessionType } from '../../shared/types'
 
 declare global {
   interface Window {

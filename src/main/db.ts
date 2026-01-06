@@ -2,35 +2,7 @@ import { randomUUID } from 'crypto'
 import { app } from 'electron'
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs'
 import { join } from 'path'
-
-export interface TimerSettings {
-  workDuration: number
-  breakDuration: number
-  autoStart: boolean
-  soundEnabled: boolean
-}
-
-export interface UserStats {
-  totalSessions: number
-  totalMinutes: number
-  bestStreak: number
-  currentStreak: number
-}
-
-export type SessionType = 'work' | 'break'
-
-export interface HistoryEntry {
-  id: string
-  type: SessionType
-  durationMinutes: number
-  completedAt: string
-}
-
-export interface AppData {
-  settings: TimerSettings
-  stats: UserStats
-  history: HistoryEntry[]
-}
+import type { AppData, HistoryEntry, SessionType, TimerSettings, UserStats } from '../shared/types'
 
 const DEFAULT_DATA: AppData = {
   settings: {
