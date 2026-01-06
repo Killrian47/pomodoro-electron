@@ -1,4 +1,3 @@
-/* eslint-disable prefer-const */
 import { NavLink, Outlet, useLocation } from 'react-router-dom'
 import '../style.css'
 
