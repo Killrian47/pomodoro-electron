@@ -57,6 +57,7 @@ body {
   max-height: 100%;
   display: flex;
   flex-direction: column;
+  justify-content: center;
   overflow: hidden; /* le contenu scrolle en interne si nécessaire */
   padding: clamp(18px, 4vw, 24px) clamp(16px, 4vw, 22px) clamp(12px, 3vw, 14px);
   border-radius: clamp(16px, 4vw, 20px);
@@ -143,7 +144,8 @@ body {
   overflow-y: auto;
   display: flex;
   flex-direction: column;
-  gap: clamp(12px, 3vw, 18px);
+  justify-content: space-around;
+  gap: clamp(24px, 4vw, 20px);
   scrollbar-width: none;
   -ms-overflow-style: none;
   min-height: 0;
@@ -234,7 +236,7 @@ body {
   justify-content: center;
   gap: clamp(8px, 2vw, 10px);
   flex-wrap: wrap;
-  margin-top: clamp(12px, 3vw, 18px);
+  margin-top: clamp(24px, 3vw, 18px);
 }
 
 .control-btn {
